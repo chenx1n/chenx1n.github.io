@@ -8,5 +8,5 @@ module.exports = {
       },
     },
   },
-  outputDir: 'vue'
+  outputDir: 'docs'
 }
