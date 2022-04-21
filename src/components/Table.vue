@@ -1,33 +1,16 @@
 <template>
   <div>
     <h3 class="title">
-      <div class="table-name">{{ name }}</div>
+      <div class="table-name">{{ data.name }}</div>
       <div>
         <!-- <a-button  shape="circle" icon="search" /> -->
         人数：
-        <a-input-number
-          :min="1"
-          :max="10"
-          :precision="0"
-          :value="num"
-          @change="numChange"
-        />
-        <a-button
-          style="margin-left: 10px"
-          @click="showModal"
-          shape="circle"
-          icon="plus"
-        />
+        <a-input-number :min="1" :max="1000" :precision="0" :value="data.num" @change="numChange" />
+        <a-button title="添加" style="margin-left: 10px" @click="showModal" shape="circle" icon="plus" />
+        <a-button title="删除" style="margin-left: 10px" type="danger" @click="delProject" shape="circle" icon="delete" />
       </div>
     </h3>
-    <a-table
-      bordered
-      size="small"
-      :pagination="false"
-      :columns="columns"
-      :dataSource="dataSource"
-      rowKey="name"
-    >
+    <a-table bordered size="small" :pagination="false" :columns="columns" :dataSource="dataSource" rowKey="name">
       <template slot="operation" slot-scope="text, record">
         <a @click="del(record)">删除</a>
       </template>
@@ -38,7 +21,7 @@
     <a-modal title="新建项目" v-model="visible" @ok="add">
       <p class="form-item">
         <a-row :gutter="20">
-          <a-col :span="6" class="form-label">项目名称：</a-col>
+          <a-col :span="6" class="form-label">支出名称：</a-col>
           <a-col :span="18">
             <a-input ref="input" v-model="form.name" />
           </a-col>
@@ -47,9 +30,7 @@
       <p class="form-item">
         <a-row :gutter="20">
           <a-col :span="6" class="form-label">金额：</a-col>
-          <a-col :span="18"
-            ><a-input-number :min="0" :precision="0" v-model="form.money"
-          /></a-col>
+          <a-col :span="18"><a-input-number :min="0" :precision="0" v-model="form.money" /></a-col>
         </a-row>
       </p>
     </a-modal>
@@ -59,7 +40,7 @@
 <script>
 const columns = [
   {
-    title: '项目名称',
+    title: '支出名称',
     dataIndex: 'name',
   },
   // {
@@ -83,27 +64,15 @@ const columns = [
 export default {
   name: 'CTable',
   props: {
-    list: {
-      type: Array,
-      default: function () {
-        return [];
-      },
-    },
-    num: {
-      type: [Number, String],
-      default: 0,
-    },
-    name: {
-      type: String,
-    },
+    data: Object,
   },
   computed: {
     dataSource() {
-      return this.list.map((d) => {
+      return this.data.list.map((d) => {
         return {
           name: d.name,
           money: d.money,
-          average: (d.money / this.num).toFixed(2),
+          average: (d.money / this.data.num).toFixed(2),
         };
       });
     },
@@ -126,25 +95,28 @@ export default {
       this.visible = true;
       this.form = { name: undefined, money: 0 };
       this.$nextTick(() => {
-        this.$refs.input.focus()
-      })
+        this.$refs.input.focus();
+      });
     },
     add() {
-      let list = JSON.parse(JSON.stringify(this.list));
+      let list = JSON.parse(JSON.stringify(this.data.list));
       list.push(this.form);
       this.$emit('listChange', list);
       this.visible = false;
     },
     del(record) {
-      let list = JSON.parse(JSON.stringify(this.list));
+      let list = JSON.parse(JSON.stringify(this.data.list));
       list = list.filter((d) => d.name != record.name);
       this.$emit('listChange', list);
+    },
+    delProject() {
+      this.$emit('delProject', this.data.key);
     },
     footerText(currentPageData) {
       let total = currentPageData.reduce((acc, cur) => {
         return acc + cur.money;
       }, 0);
-      return `总计 ${total}，平均${(total / this.num).toFixed(2)}`;
+      return `总计 ${total}，平均${(total / this.data.num).toFixed(2)}`;
     },
   },
 };

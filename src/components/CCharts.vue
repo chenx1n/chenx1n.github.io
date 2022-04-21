@@ -4,52 +4,41 @@
 
 <script>
 import * as echarts from 'echarts/core';
-import {
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-} from 'echarts/components';
+import { TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 
 export default {
   props: {
-    girlList: {
-      type: Array,
-    },
-    boyList: {
-      type: Array,
-    },
-    commonList: {
-      type: Array,
-    },
+    data: Array,
   },
   name: 'CCharts',
   data() {
     return {
       seriesList: [],
       myChart: undefined,
+      yAxis: [],
     };
   },
   watch: {
-    girlList() {
-      this.refreshData();
+    data: {
+      handler() {
+        this.refreshData();
+      },
+      deep: true,
     },
-    boyList() {
-      this.refreshData();
-    },
-    commonList() {
-      this.refreshData();
-    },
+    // girlList() {
+    //   this.refreshData();
+    // },
+    // boyList() {
+    //   this.refreshData();
+    // },
+    // commonList() {
+    //   this.refreshData();
+    // },
   },
   mounted() {
-    echarts.use([
-      TooltipComponent,
-      GridComponent,
-      LegendComponent,
-      BarChart,
-      CanvasRenderer,
-    ]);
+    echarts.use([TooltipComponent, GridComponent, LegendComponent, BarChart, CanvasRenderer]);
     var chartDom = document.getElementById('main');
     this.myChart = echarts.init(chartDom);
     this.handleData();
@@ -57,13 +46,22 @@ export default {
   },
   methods: {
     handleData() {
-      // 获取所有项目名称并去重
-      let allList = [...this.girlList, ...this.boyList, ...this.commonList];
-      let allNameList = allList.map((d) => d.name);
-      let nameList = Array.from(new Set(allNameList));
+      let allList = [...this.data];
+      // 获取y轴 名称
+      let yNames = allList.map((d) => d.name);
+      let nameList = Array.from(new Set(yNames));
+      this.yAxis = nameList;
+
+      // 获取所有支出名称
+      let names = [];
+      allList.forEach((d) => {
+        let arr = d.list.map((l) => l.name);
+        names.push(...arr);
+      });
+      let allNames = Array.from(new Set(names));
       // 设置图表数据
       this.seriesList = [];
-      nameList.forEach((d) => {
+      allNames.forEach((d) => {
         let option = {
           name: d,
           type: 'bar',
@@ -76,8 +74,8 @@ export default {
           },
           data: [],
         };
-        ['girlList', 'boyList', 'commonList'].forEach((l) => {
-          let data = this[l].find((item) => item.name == d);
+        this.data.forEach((l) => {
+          let data = l.list.find((item) => item.name == d);
           data ? option.data.push(data.money) : option.data.push('');
         });
         this.seriesList.push(option);
@@ -106,7 +104,7 @@ export default {
         },
         yAxis: {
           type: 'category',
-          data: ['女生', '男生', '公共'],
+          data: this.yAxis,
         },
         series: this.seriesList,
       };
