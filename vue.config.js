@@ -8,5 +8,7 @@ module.exports = {
       },
     },
   },
-  outputDir: 'docs'
+
+  outputDir: 'docs',
+  productionSourceMap: false
 }
