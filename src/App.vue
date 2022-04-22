@@ -6,21 +6,38 @@
         <div class="actions">
           <a-space>
             <a-button icon="plus" @click="showModal('user')">新增人员</a-button>
-            <a-button icon="plus" @click="showModal('project')">新增项目</a-button>
-            <a-button type="danger" @click="clearData">清空数据</a-button>
+            <a-button icon="plus" @click="showModal('project')"
+              >新增项目</a-button
+            >
+            <a-popconfirm title="确认清空数据?" @confirm="clearData">
+              <a-button type="danger">清空数据</a-button>
+            </a-popconfirm>
           </a-space>
         </div>
-        <a-row type="flex" justify="left" align="top" class="table-container" :gutter="20" v-if="list.length">
+        <!-- <a-row type="flex" justify="left" align="top" class="table-container" :gutter="20" v-if="list.length">
           <a-col :span="8" v-for="item in list" :key="item.key">
             <c-table :data="item" @listChange="(list) => (item.list = list)" @numChange="(num) => (item.num = num)" @delProject="delProject"></c-table>
           </a-col>
-        </a-row>
+        </a-row> -->
+        <c-table
+          :data="list"
+          :users="users"
+          @listChange="listChange"
+          @delProject="delProject"
+        ></c-table>
+
         <template v-if="list.length">
           <h2 class="title">可视化图表</h2>
           <c-charts :data="list"></c-charts>
         </template>
-        <a-empty style="margin-top: 20px" v-else />
-        <add-modal :type="modalType" :userList="users" ref="addModal" @add="add" @updateUser="updateUser"></add-modal>
+        <add-modal
+          :type="modalType"
+          :userList="users"
+          :list="list"
+          ref="addModal"
+          @confirm="add"
+          @updateUser="updateUser"
+        ></add-modal>
       </div>
     </a-config-provider>
   </div>
@@ -61,13 +78,17 @@ export default {
     this.saveData();
   },
   methods: {
+    listChange(list) {
+      this.list = list;
+    },
     delProject(key) {
       this.list = this.list.filter((d) => d.key != key);
     },
-    add({ name, users }) {
+    add({ name, users, money }) {
       this.list.push({
         name,
-        list: [],
+        // list: [],
+        money,
         users,
         key: Date.now(),
       });
@@ -77,7 +98,8 @@ export default {
     },
     showModal(type) {
       // 如果 type 为 project 并且没有人员信息 则给出提示
-      if (type == 'project' && !this.users.length) return this.$message.warning('请新增人员!');
+      if (type == 'project' && !this.users.length)
+        return this.$message.warning('请新增人员!');
       this.modalType = type;
       this.$refs.addModal.showModal();
     },
@@ -108,8 +130,14 @@ export default {
       let commonMoney = this.commonList.reduce((acc, cur) => {
         return acc + cur.money;
       }, 0);
-      let girlText = `女生总计 ${(girlMoney / this.numObj.girlNum + commonMoney / this.numObj.commonNum).toFixed(2)}`;
-      let boyText = `男生总计 ${(boyMoney / this.numObj.girlNum + commonMoney / this.numObj.commonNum).toFixed(2)}`;
+      let girlText = `女生总计 ${(
+        girlMoney / this.numObj.girlNum +
+        commonMoney / this.numObj.commonNum
+      ).toFixed(2)}`;
+      let boyText = `男生总计 ${(
+        boyMoney / this.numObj.girlNum +
+        commonMoney / this.numObj.commonNum
+      ).toFixed(2)}`;
       return `${girlText}, ${boyText}`;
     },
   },
@@ -133,5 +161,11 @@ export default {
 }
 .actions {
   text-align: right;
+}
+.has-error {
+  color: #f5222d;
+}
+.has-error:hover {
+  color: #f5222d;
 }
 </style>

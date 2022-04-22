@@ -4,7 +4,11 @@
 
 <script>
 import * as echarts from 'echarts/core';
-import { TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
+import {
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+} from 'echarts/components';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 
@@ -27,18 +31,15 @@ export default {
       },
       deep: true,
     },
-    // girlList() {
-    //   this.refreshData();
-    // },
-    // boyList() {
-    //   this.refreshData();
-    // },
-    // commonList() {
-    //   this.refreshData();
-    // },
   },
   mounted() {
-    echarts.use([TooltipComponent, GridComponent, LegendComponent, BarChart, CanvasRenderer]);
+    echarts.use([
+      TooltipComponent,
+      GridComponent,
+      LegendComponent,
+      BarChart,
+      CanvasRenderer,
+    ]);
     var chartDom = document.getElementById('main');
     this.myChart = echarts.init(chartDom);
     this.handleData();
@@ -46,14 +47,14 @@ export default {
   },
   methods: {
     handleData() {
+      // 一个表格逻辑
       let allList = [...this.data];
       // 获取y轴 名称 || 获取所有支出名称
       let yNames = [];
       let names = [];
       allList.forEach((d) => {
         yNames.push(...d.users.map((u) => u));
-        let arr = d.list.map((l) => l.name);
-        names.push(...arr);
+        names.push(d.name);
       });
       let nameList = Array.from(new Set(yNames));
       this.yAxis = nameList;
@@ -76,22 +77,70 @@ export default {
           },
           data: [],
         };
-        // 循环所有人员 给每个字项目添加所有人员的支出
         this.yAxis.forEach((u) => {
           // 获取当前项目的数据
-          let currData = this.data.find((item) => {
-            return item.list.find((l) => l.name == d);
-          });
+          let currData = allList.find((item) => item.name == d);
           // 判断当前人员在不在项目里面
           let hasUser = currData.users.find((d) => d == u);
           // 在 添加平均数据
           if (hasUser) {
-            let currList = currData.list.find((l) => l.name == d);
-            option.data.push((currList.money / currData.users.length).toFixed(2));
+            option.data.push(
+              (currData.money / currData.users.length).toFixed(2)
+            );
           } else option.data.push('');
         });
         this.seriesList.push(option);
       });
+
+      // 多个表格逻辑
+      // let allList = [...this.data];
+      // // 获取y轴 名称 || 获取所有支出名称
+      // let yNames = [];
+      // let names = [];
+      // allList.forEach((d) => {
+      //   yNames.push(...d.users.map((u) => u));
+      //   let arr = d.list.map((l) => l.name);
+      //   names.push(...arr);
+      // });
+      // let nameList = Array.from(new Set(yNames));
+      // this.yAxis = nameList;
+      // let allNames = Array.from(new Set(names));
+
+      // // 设置图表数据
+      // this.seriesList = [];
+
+      // // 循环所有子项目
+      // allNames.forEach((d) => {
+      //   let option = {
+      //     name: d,
+      //     type: 'bar',
+      //     stack: 'total',
+      //     label: {
+      //       show: true,
+      //     },
+      //     emphasis: {
+      //       focus: 'series',
+      //     },
+      //     data: [],
+      //   };
+      // // 循环所有人员 给每个字项目添加所有人员的支出
+      // this.yAxis.forEach((u) => {
+      //   // 获取当前项目的数据
+      //   let currData = this.data.find((item) => {
+      //     return item.list.find((l) => l.name == d);
+      //   });
+      //   // 判断当前人员在不在项目里面
+      //   let hasUser = currData.users.find((d) => d == u);
+      //   // 在 添加平均数据
+      //   if (hasUser) {
+      //     let currList = currData.list.find((l) => l.name == d);
+      //     option.data.push(
+      //       (currList.money / currData.users.length).toFixed(2)
+      //     );
+      //   } else option.data.push('');
+      // });
+      //   this.seriesList.push(option);
+      // });
     },
     // 更新数据
     refreshData() {

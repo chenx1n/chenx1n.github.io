@@ -10,5 +10,5 @@ module.exports = {
   },
 
   outputDir: 'docs',
-  productionSourceMap: false
-}
+  productionSourceMap: false,
+};
