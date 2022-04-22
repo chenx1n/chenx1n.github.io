@@ -156,14 +156,16 @@ export default {
             var relVal = params[0].name;
             let total = 0;
             for (var i = 0, l = params.length; i < l; i++) {
-              relVal +=
-                '<br/>' +
-                params[i].marker +
-                params[i].seriesName +
-                ' : ' +
-                params[i].value +
-                '元';
-              total += +params[i].value;
+              if (params[i].value) {
+                relVal +=
+                  '<br/>' +
+                  params[i].marker +
+                  params[i].seriesName +
+                  ' : ' +
+                  params[i].value +
+                  '元';
+                total += +params[i].value;
+              }
             }
             relVal += `<br/> 总计: ${total}`;
             return relVal;
