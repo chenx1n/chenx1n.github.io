@@ -15,7 +15,7 @@
         <a-input ref="input" @pressEnter="addUser" v-model="userName"></a-input>
         <a-alert style="margin: 10px 0" message="输入完成按下回车，可连续添加" type="info" />
         <a-card size="small">
-          <a-tag v-for="(item, i) in users" :key="i" closable @close="delUser(i)">{{ item.name }}</a-tag>
+          <a-tag v-for="(item, i) in users" :key="i" :visible="!!item" closable @close="delUser(i)">{{ item.name }}</a-tag>
         </a-card>
       </div>
     </a-modal>
@@ -81,6 +81,7 @@ export default {
       });
     },
     delUser(i) {
+      console.log(i);
       this.users.splice(i, 1);
     },
     addUser() {
