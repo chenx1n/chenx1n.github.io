@@ -3,20 +3,18 @@
     <h3 class="title">
       <div class="table-name">{{ data.name }}</div>
       <div>
-        <!-- <a-button  shape="circle" icon="search" /> -->
-        人数：
-        <a-input-number :min="1" :max="1000" :precision="0" :value="data.num" @change="numChange" />
         <a-button title="添加" style="margin-left: 10px" @click="showModal" shape="circle" icon="plus" />
         <a-button title="删除" style="margin-left: 10px" type="danger" @click="delProject" shape="circle" icon="delete" />
       </div>
     </h3>
+    <div style="text-align: right;">人员：{{ data.users.join() }} &nbsp;&nbsp; 人数：{{ data.users.length }}</div>
     <a-table bordered size="small" :pagination="false" :columns="columns" :dataSource="dataSource" rowKey="name">
       <template slot="operation" slot-scope="text, record">
         <a @click="del(record)">删除</a>
       </template>
-      <!-- <template slot="footer" slot-scope="currentPageData">
+      <template slot="footer" slot-scope="currentPageData">
         {{ footerText(currentPageData) }}
-      </template> -->
+      </template>
     </a-table>
     <a-modal title="新建项目" v-model="visible" @ok="add">
       <p class="form-item">
@@ -72,7 +70,7 @@ export default {
         return {
           name: d.name,
           money: d.money,
-          average: (d.money / this.data.num).toFixed(2),
+          average: (d.money / this.data.users.length).toFixed(2),
         };
       });
     },
@@ -116,7 +114,7 @@ export default {
       let total = currentPageData.reduce((acc, cur) => {
         return acc + cur.money;
       }, 0);
-      return `总计 ${total}，平均${(total / this.data.num).toFixed(2)}`;
+      return `总计 ${total}，平均${(total / this.data.users.length).toFixed(2)}/人`;
     },
   },
 };

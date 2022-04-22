@@ -5,11 +5,12 @@
         <h2 class="title">人均消费支出</h2>
         <div class="actions">
           <a-space>
-            <a-button icon="plus" @click="showModal">新增项目</a-button>
+            <a-button icon="plus" @click="showModal('user')">新增人员</a-button>
+            <a-button icon="plus" @click="showModal('project')">新增项目</a-button>
             <a-button type="danger" @click="clearData">清空数据</a-button>
           </a-space>
         </div>
-        <a-row class="table-container" :gutter="20" v-if="list.length">
+        <a-row type="flex" justify="left" align="top" class="table-container" :gutter="20" v-if="list.length">
           <a-col :span="8" v-for="item in list" :key="item.key">
             <c-table :data="item" @listChange="(list) => (item.list = list)" @numChange="(num) => (item.num = num)" @delProject="delProject"></c-table>
           </a-col>
@@ -18,8 +19,8 @@
           <h2 class="title">可视化图表</h2>
           <c-charts :data="list"></c-charts>
         </template>
-        <a-empty v-else />
-        <add-modal ref="addModal" @add="add"></add-modal>
+        <a-empty style="margin-top: 20px" v-else />
+        <add-modal :type="modalType" :userList="users" ref="addModal" @add="add" @updateUser="updateUser"></add-modal>
       </div>
     </a-config-provider>
   </div>
@@ -42,14 +43,20 @@ export default {
     return {
       zhCN,
       list: [],
+      users: [],
+      modalType: 'user',
     };
   },
   created() {
     let data = localStorage.getItem('data');
     if (data) {
-      this.list = JSON.parse(data);
+      this.list = JSON.parse(data).list;
+      this.users = JSON.parse(data).users;
     }
-    if (!Array.isArray(this.list)) this.list = [];
+    // 数据错乱 或 没有数据  重置
+    if (!Array.isArray(this.list) || !Array.isArray(this.users)) {
+      this.clearData(false);
+    }
     // 离开/刷新页面保存数据
     this.saveData();
   },
@@ -57,26 +64,38 @@ export default {
     delProject(key) {
       this.list = this.list.filter((d) => d.key != key);
     },
-    add({ name }) {
+    add({ name, users }) {
       this.list.push({
         name,
         list: [],
-        num: 1,
+        users,
         key: Date.now(),
       });
     },
-    showModal() {
+    updateUser(users) {
+      this.users = users;
+    },
+    showModal(type) {
+      // 如果 type 为 project 并且没有人员信息 则给出提示
+      if (type == 'project' && !this.users.length) return this.$message.warning('请新增人员!');
+      this.modalType = type;
       this.$refs.addModal.showModal();
     },
     saveData() {
       let _this = this;
       window.onbeforeunload = function () {
-        let data = _this.list;
+        let data = {
+          list: _this.list,
+          users: _this.users,
+        };
+
         localStorage.setItem('data', JSON.stringify(data));
       };
     },
-    clearData() {
+    clearData(isTips = true) {
+      isTips && this.$message.success('清空数据成功!');
       this.list = [];
+      this.users = [];
       localStorage.removeItem('data');
     },
     totalText() {
