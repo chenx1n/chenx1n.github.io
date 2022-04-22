@@ -16,12 +16,13 @@
       :dataSource="dataSource"
       rowKey="key"
     >
-      <span slot="customTitle"
-        >平均(元)
+      <span slot="customTitle">
+        <span>平均(元)</span>
         <a-tooltip>
           <template slot="title"> 仅供参考 </template>
-          <a-icon style="margin-left: 6px" type="question-circle" /> </a-tooltip
-      ></span>
+          <a-icon style="margin-left: 6px" type="question-circle" />
+        </a-tooltip>
+      </span>
       <template slot="users" slot-scope="text, record">
         {{ record.users.join() }}
       </template>
@@ -32,9 +33,13 @@
           <a class="has-error">删除</a>
         </a-popconfirm>
       </template>
-      <!-- <template slot="footer" slot-scope="currentPageData">
-        {{ footerText(currentPageData) }}
-      </template> -->
+      <template slot="footer" slot-scope="currentPageData">
+        <span>{{ footerText(currentPageData) }}</span>
+        <a-tooltip>
+          <template slot="title"> 仅供参考 </template>
+          <a-icon style="margin-left: 6px" type="question-circle" />
+        </a-tooltip>
+      </template>
     </a-table>
     <a-modal title="新建项目" v-model="visible" @ok="add">
       <p class="form-item">
@@ -159,12 +164,25 @@ export default {
       this.$emit('delProject', this.data.key);
     },
     footerText(currentPageData) {
+      let arr = [];
       let total = currentPageData.reduce((acc, cur) => {
+        cur.users.forEach((u) => {
+          let index = arr.findIndex((d) => d.name == u);
+          if (index != -1) {
+            arr[index].money += parseFloat(cur.average);
+          } else {
+            arr.push({
+              name: u,
+              money: parseFloat(cur.average),
+            });
+          }
+        });
         return acc + cur.money;
       }, 0);
-      return `总计 ${total}，平均${(total / this.data.users.length).toFixed(
-        2
-      )}/人`;
+      // console.log(arr);
+      return `总计 ${total}元。 人员统计：${arr
+        .map((d) => d.name + ' 共计 ' + d.money + '元')
+        .join('，')}`;
     },
   },
 };

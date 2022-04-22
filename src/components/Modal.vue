@@ -24,6 +24,7 @@
           <a-input-number
             :min="0"
             :precision="0"
+            :max="Number.MAX_VALUE"
             v-model="form.money"
             placeholder="请输入金额"
           />
@@ -71,6 +72,13 @@ export default {
     list: Array,
   },
   data() {
+    let validateMoney = (rule, value, callback) => {
+      if (value == 0 || isNaN(value)) {
+        callback(new Error('请输入金额'));
+      } else {
+        callback();
+      }
+    };
     return {
       modalVisible: false,
       form: {
@@ -82,6 +90,15 @@ export default {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' },
           { min: 1, max: 20, message: '长度在1-20内', trigger: 'blur' },
+        ],
+        money: [
+          {
+            type: 'number',
+            required: true,
+            message: '请输入金额',
+            trigger: 'blur',
+          },
+          { validator: validateMoney, trigger: 'blur' },
         ],
         users: [
           {

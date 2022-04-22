@@ -2,7 +2,19 @@
   <div id="app">
     <a-config-provider :locale="zhCN">
       <div>
-        <h2 class="title">人均消费支出</h2>
+        <h2 class="title">
+          人均消费支出
+          <a-tooltip>
+            <template slot="title">
+              <ol style="margin-bottom: 0">
+                <li>数据仅本地存储</li>
+                <li>更换电脑、浏览器之后，不会显示之前的数据</li>
+                <li>练习产品，仅供娱乐</li>
+              </ol>
+            </template>
+            <a-icon style="margin-left: 6px" type="question-circle" />
+          </a-tooltip>
+        </h2>
         <div class="actions">
           <a-space>
             <a-button icon="plus" @click="showModal('user')">新增人员</a-button>
@@ -27,7 +39,6 @@
         ></c-table>
 
         <template v-if="list.length">
-          <h2 class="title">可视化图表</h2>
           <c-charts :data="list"></c-charts>
         </template>
         <add-modal

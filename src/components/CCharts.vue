@@ -71,6 +71,7 @@ export default {
           stack: 'total',
           label: {
             show: true,
+            formatter: '{c}' + '元',
           },
           emphasis: {
             focus: 'series',
@@ -167,7 +168,7 @@ export default {
                 total += +params[i].value;
               }
             }
-            relVal += `<br/> 总计: ${total}`;
+            relVal += `<br/> 总计: ${total} 元`;
             return relVal;
           },
         },
