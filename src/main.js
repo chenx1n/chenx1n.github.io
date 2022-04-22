@@ -18,6 +18,8 @@ import {
   Checkbox,
   Divider,
   Popconfirm,
+  Icon,
+  Tooltip,
 } from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 Vue.use(Space);
@@ -36,6 +38,8 @@ Vue.use(Card);
 Vue.use(Checkbox);
 Vue.use(Divider);
 Vue.use(Popconfirm);
+Vue.use(Icon);
+Vue.use(Tooltip);
 
 Vue.prototype.$message = message;
 Vue.config.productionTip = false;

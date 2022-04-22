@@ -152,6 +152,22 @@ export default {
             // Use axis to trigger tooltip
             type: 'shadow', // 'shadow' as default; can also be 'line' or 'shadow'
           },
+          formatter: function (params) {
+            var relVal = params[0].name;
+            let total = 0;
+            for (var i = 0, l = params.length; i < l; i++) {
+              relVal +=
+                '<br/>' +
+                params[i].marker +
+                params[i].seriesName +
+                ' : ' +
+                params[i].value +
+                '元';
+              total += +params[i].value;
+            }
+            relVal += `<br/> 总计: ${total}`;
+            return relVal;
+          },
         },
         legend: {},
         grid: {

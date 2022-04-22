@@ -16,6 +16,12 @@
       :dataSource="dataSource"
       rowKey="key"
     >
+      <span slot="customTitle"
+        >平均(元)
+        <a-tooltip>
+          <template slot="title"> 仅供参考 </template>
+          <a-icon style="margin-left: 6px" type="question-circle" /> </a-tooltip
+      ></span>
       <template slot="users" slot-scope="text, record">
         {{ record.users.join() }}
       </template>
@@ -71,12 +77,13 @@ const columns = [
     scopedSlots: { customRender: 'users' },
   },
   {
-    title: '金额',
+    title: '金额(元)',
     dataIndex: 'money',
   },
   {
-    title: '平均',
+    // title: '平均(元)',
     dataIndex: 'average',
+    slots: { title: 'customTitle' },
   },
   {
     title: '操作',
