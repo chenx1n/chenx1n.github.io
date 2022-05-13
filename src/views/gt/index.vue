@@ -78,7 +78,7 @@ export default {
   methods: {
     init() {
       // 获取天气
-      // this.getWeather()
+      this.getWeather()
 
       this.getStatistics();
 
