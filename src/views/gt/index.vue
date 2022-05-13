@@ -35,6 +35,21 @@
           <h4 class="total">今天是我们在一起的第{{ totalDay }}天</h4>
           <h4 class="birth" v-if="isBirthDay">生日快乐！贝贝</h4>
           <h4 class="birth" v-else>距离你生日还剩{{ youBirthDay }}天</h4>
+          <h4>未来三天天气</h4>
+          <h5 v-for="(item, index) in weatherInfo" :key="index">
+            <span>{{ dayText(index) }}</span>
+            <span
+              >白天:{{ item.textDay
+              }}<i style="margin-left: 4px" :class="`qi-${item.iconDay}`"></i>
+            </span>
+            <span style="margin-left: 8px"
+              >晚间:{{ item.textNight
+              }}<i style="margin-left: 4px" :class="`qi-${item.iconNight}`"></i>
+            </span>
+            <span style="margin-left: 8px">{{ item.tempMin }}℃</span>至<span
+              >{{ item.tempMax }}℃</span
+            >
+          </h5>
         </a-col>
       </a-row>
     </div>
@@ -50,7 +65,7 @@ const BIRTH_DAY = '10-11';
 export default {
   data() {
     return {
-      weatherInfo: {},
+      weatherInfo: [],
       youBirthDay: 0,
       totalDay: 0,
       currDate: new Date(),
@@ -71,6 +86,17 @@ export default {
     isBirthDay() {
       return this.youBirthDay == 0;
     },
+    dayText() {
+      return function (index) {
+        if (index == 0) {
+          return '今天';
+        } else if (index == 1) {
+          return '明天';
+        } else {
+          return '后天';
+        }
+      };
+    },
   },
   mounted() {
     this.init();
@@ -78,7 +104,7 @@ export default {
   methods: {
     init() {
       // 获取天气
-      this.getWeather()
+      this.getWeather();
 
       this.getStatistics();
 
@@ -108,15 +134,29 @@ export default {
     },
     getWeather() {
       let currDate = formatDate(new Date(), 'yyyy-MM-dd');
-      let weather = localStorage.getItem('weather');
+      let weather = localStorage.getItem('weather')
+        ? JSON.parse(localStorage.getItem('weather'))
+        : '';
       if (weather && weather.date == currDate) {
         this.weatherInfo = weather.data;
       } else {
+        localStorage.removeItem('weather');
         fetch(
-          'http://apis.juhe.cn/simpleWeather/query?city=%E6%AD%A6%E6%B1%89&key=452193ecad3162772f34fd24c3f42a96'
+          'https://devapi.qweather.com/v7/weather/3d?location=101200101&key=5fc9b4616e49495ba1f0df243df11482'
         )
           .then((response) => response.json())
-          .then((json) => console.log(json))
+          .then((res) => {
+            if (res.code == 200) {
+              this.weatherInfo = res.daily;
+              localStorage.setItem(
+                'weather',
+                JSON.stringify({
+                  data: this.weatherInfo,
+                  date: currDate,
+                })
+              );
+            }
+          })
           .catch((err) => console.log('Request Failed', err));
       }
     },
@@ -131,8 +171,14 @@ export default {
         .querySelector('.info-bg')
         .getBoundingClientRect().width;
       document.querySelector('.title').style.fontSize = width / 10 + 'px';
-      document.querySelector('.total').style.fontSize = width / 20 + 'px';
-      document.querySelector('.birth').style.fontSize = width / 20 + 'px';
+      let h4Arr = document.querySelectorAll('h4');
+      for (let i = 0; i < h4Arr.length; i++) {
+        h4Arr[i].style.fontSize = width / 20 + 'px';
+      }
+      let h5Arr = document.querySelectorAll('h5');
+      for (let i = 0; i < h5Arr.length; i++) {
+        h5Arr[i].style.fontSize = width / 25 + 'px';
+      }
     },
     // bg
     randomRadius() {
@@ -201,7 +247,7 @@ export default {
   width: 100%;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -70%);
 }
 .info-bg {
   text-align: center;
@@ -209,9 +255,12 @@ export default {
   /* background-color: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(6px); */
 }
+h1,
+h2,
 h3,
-h4 {
-  font-size: 30px;
+h4,
+h5,
+h6 {
   color: #fff;
 }
 #sky {
