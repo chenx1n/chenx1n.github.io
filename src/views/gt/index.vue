@@ -31,7 +31,9 @@
     <div class="info">
       <a-row type="flex" justify="center">
         <a-col class="info-bg" :xs="18" :sm="18" :md="16" :lg="16" :xl="14">
-          <h3 class="title">Hey girl!</h3>
+          <h3 class="title font-effect-anaglyph font-effect-3d-float">
+            Hey girl
+          </h3>
           <h4 class="total">今天是我们在一起的第{{ totalDay }}天</h4>
           <h4 class="birth" v-if="isBirthDay">生日快乐！贝贝</h4>
           <h4 class="birth" v-else>距离你生日还剩{{ youBirthDay }}天</h4>
@@ -120,16 +122,17 @@ export default {
     },
     // 统计日期数据
     getStatistics() {
+      let currDate = formatDate(this.currDate, 'yyyy-MM-dd');
       let birth_day = `${formatDate(new Date(), 'yyyy')}-${BIRTH_DAY}`;
-      this.youBirthDay = this.getDay(birth_day, this.currDate);
+      this.youBirthDay = this.getDay(birth_day, currDate);
       // 判断今年生日是否已经过了
       let birthTime = new Date(birth_day).getTime();
-      let currTime = new Date(this.currDate).getTime();
+      let currTime = new Date(currDate).getTime();
       // 当前日期大于生日 过完
       if (currTime > birthTime) {
         birth_day = `${+formatDate(new Date(), 'yyyy') + 1}-${BIRTH_DAY}`;
       }
-      this.totalDay = this.getDay(MEMORIAL_DAY, this.currDate);
+      this.totalDay = this.getDay(MEMORIAL_DAY, currDate);
       // let currDate
     },
     getWeather() {
@@ -254,6 +257,9 @@ export default {
   color: #fff;
   /* background-color: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(6px); */
+}
+.info-bg .title {
+  font-family: Rancho;
 }
 h1,
 h2,
