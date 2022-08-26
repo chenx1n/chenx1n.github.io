@@ -20,6 +20,14 @@ const routes = [
       title: '❤️',
     },
   },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/test'),
+    meta: {
+      title: '测试',
+    },
+  },
 ];
 
 const router = new VueRouter({
