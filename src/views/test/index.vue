@@ -8,7 +8,7 @@
     <qrcode-stream
       class="qrcode-stream"
       @decode="onDecode"
-      :track="paintBoundingBox"
+      :track="selected.value"
       :torch="torch"
     >
       <div class="tools">
