@@ -1,6 +1,11 @@
 <template>
   <div>
-    <qrcode-stream class="qrcode-stream" @decode="onDecode" :torch="torch">
+    <qrcode-stream
+      class="qrcode-stream"
+      @decode="onDecode"
+      :track="paintBoundingBox"
+      :torch="torch"
+    >
       <div class="tools">
         <button class="tool-item">反转相机</button>
         <button class="tool-item" @click="torch = !torch">打开手电</button>
@@ -31,6 +36,17 @@ export default {
   methods: {
     onDecode(url) {
       this.result = url;
+    },
+    paintBoundingBox(detectedCodes, ctx) {
+      for (const detectedCode of detectedCodes) {
+        const {
+          boundingBox: { x, y, width, height },
+        } = detectedCode;
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#007bff';
+        ctx.strokeRect(x, y, width, height);
+      }
     },
   },
 };
