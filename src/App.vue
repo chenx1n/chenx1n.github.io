@@ -1,40 +1,57 @@
-<template>
-  <div id="app">
-    <a-config-provider :locale="zhCN">
-      <router-view />
-    </a-config-provider>
-  </div>
-</template>
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import useAppStore from '@/stores/modules/app'
+import useRouteCache from '@/stores/modules/routeCache'
+import useRouteTransitionNameStore from '@/stores/modules/routeTransitionName'
+import useAutoThemeSwitcher from '@/hooks/useAutoThemeSwitcher'
 
-<script>
-import zhCN from 'ant-design-vue/es/locale/zh_CN';
-
-export default {
-  name: 'App',
-  data() {
-    return {
-      zhCN,
-    };
-  },
-  watch: {
-    $route: {
-      handler(route) {
-        if (route.meta && route.meta.title) {
-          document.title = route.meta.title;
-        } else {
-          document.title = 'cx';
-        }
-      },
+useHead({
+  title: 'Vue3 Vant Mobile',
+  meta: [
+    {
+      name: 'description',
+      content: 'Vue + Vite H5 Starter Template',
     },
-  },
-};
+    {
+      name: 'theme-color',
+      content: () => isDark.value ? '#00aba9' : '#ffffff',
+    },
+  ],
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/svg+xml',
+      href: () => preferredDark.value ? '/favicon-dark.svg' : '/favicon.svg',
+    },
+  ],
+})
+
+const appStore = useAppStore()
+const { mode } = storeToRefs(appStore)
+
+const routeTransitionNameStore = useRouteTransitionNameStore()
+const { routeTransitionName } = storeToRefs(routeTransitionNameStore)
+const { initializeThemeSwitcher } = useAutoThemeSwitcher(appStore)
+
+const keepAliveRouteNames = computed(() => {
+  return useRouteCache().routeCaches as string[]
+})
+
+onMounted(() => {
+  initializeThemeSwitcher()
+})
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-</style>
+<template>
+  <VanConfigProvider :theme="mode">
+    <NavBar />
+    <router-view v-slot="{ Component, route }">
+      <transition :name="routeTransitionName">
+        <keep-alive :include="keepAliveRouteNames">
+          <component :is="Component" :key="route.name" />
+        </keep-alive>
+      </transition>
+    </router-view>
+    <TabBar />
+  </VanConfigProvider>
+</template>
